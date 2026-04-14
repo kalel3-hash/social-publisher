@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  res.json({ message: 'Endpoint de usuarios funcionando' });
-});
+const usersController = require('../controllers/usersController');
+
+router.get('/', usersController.getUsers);
 
 module.exports = router;
