@@ -1,0 +1,48 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+}
+
+.container {
+  background: white;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 2rem auto;
+  border-radius: 6px;
+}
+
+.post {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+}
+
+.status {
+  font-weight: bold;
+}
+
+.status.pending { color: orange; }
+.status.published { color: green; }
+.status.manual { color: gray; }
+
+button {
+  margin-left: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  color: white;
+}
+
+.toast.success { background: #2ecc71; }
+.toast.info { background: #3498db; }
+.toast.warn { background: #f39c12; }
+``

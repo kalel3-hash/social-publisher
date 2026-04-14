@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import './styles.css';
 
 function App() {
   const [posts, setPosts] = useState([]);
@@ -9,6 +10,12 @@ function App() {
     x: false,
     youtube: false
   });
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = 'info') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 2500);
+  };
 
   const loadPosts = () => {
     fetch('/posts')
@@ -30,6 +37,11 @@ function App() {
   const createPost = () => {
     const selectedPlatforms = Object.keys(platforms).filter(p => platforms[p]);
 
+    if (!content || selectedPlatforms.length === 0) {
+      showToast('Completá contenido y plataformas', 'warn');
+      return;
+    }
+
     fetch('/posts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -40,6 +52,7 @@ function App() {
     }).then(() => {
       setContent('');
       loadPosts();
+      showToast('Post creado', 'success');
     });
   };
 
@@ -48,16 +61,23 @@ function App() {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: 'published' })
-    }).then(loadPosts);
+    }).then(() => {
+      loadPosts();
+      showToast(`${platform} publicado`, 'success');
+    });
   };
 
   const publishAll = (postId) => {
     fetch(`/posts/${postId}/publish`, { method: 'POST' })
-      .then(loadPosts);
+      .then(() => {
+        loadPosts();
+        showToast('Publicación automática realizada', 'info');
+        showToast('YouTube y X requieren acción manual', 'warn');
+      });
   };
 
   return (
-    <div style={{ padding: '2rem' }}>
+    <div className="container">
       <h1>Social Publisher</h1>
 
       <h2>Nuevo Post</h2>
@@ -87,11 +107,14 @@ function App() {
       <h2>Posts</h2>
 
       {posts.map(post => (
-        <div key={post.id} style={{ marginBottom: '2rem' }}>
+        <div key={post.id} className="post">
           <strong>{post.content}</strong>
 
           <div>
-            <button onClick={() => publishAll(post.id)}>
+            <button
+              onClick={() => publishAll(post.id)}
+              disabled={Object.values(post.platformStatus).every(s => s === 'published')}
+            >
               Publicar todo
             </button>
           </div>
@@ -99,9 +122,10 @@ function App() {
           <ul>
             {Object.entries(post.platformStatus).map(([platform, status]) => (
               <li key={platform}>
-                {platform}: {status}
+                {platform}:{' '}
+                <span className={`status ${status}`}>{status}</span>
                 <button
-                  style={{ marginLeft: '1rem' }}
+                  disabled={status === 'published'}
                   onClick={() => publishPlatform(post.id, platform)}
                 >
                   Publicar
@@ -111,6 +135,12 @@ function App() {
           </ul>
         </div>
       ))}
+
+      {toast && (
+        <div className={`toast ${toast.type}`}>
+          {toast.message}
+        </div>
+      )}
     </div>
   );
 }
